@@ -13,8 +13,8 @@ install_cosign() {
   local version=$2
   local install_path=$3
   local bin_install_path="$install_path/bin"
-  local cosign_download_url; download_url="$(cosign_download_url "$version")"
-  local sget_download_url; download_url="$(sget_download_url "$version")"
+  local cosign_download_url; cosign_download_url="$(cosign_download_url "$version")"
+  local sget_download_url; sget_download_url="$(sget_download_url "$version")"
 
   mkdir -p "${bin_install_path}"
 
