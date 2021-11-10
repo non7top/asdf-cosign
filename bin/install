@@ -13,18 +13,24 @@ install_cosign() {
   local version=$2
   local install_path=$3
   local bin_install_path="$install_path/bin"
-  local download_url; download_url="$(get_download_url "$version")"
+  local cosign_download_url; download_url="$(cosign_download_url "$version")"
+  local sget_download_url; download_url="$(sget_download_url "$version")"
 
   mkdir -p "${bin_install_path}"
 
-  local bin_path="${bin_install_path}/cosign"
-  echo "Downloading cosign from ${download_url}"
-  curl -sSL "$download_url" -o "${install_path}/cosign"
-  #echo "Installing to ${install_path}"
-  #tar xzf "${install_path}/cosign.tar.gz" -C "${install_path}"
-  mv "${install_path}/cosign" "${bin_path}"
-  chmod +x "$bin_path"
-  #rm -rf "${install_path}/cosign.tar.gz" "${install_path}"/cosign-*
+  echo "Downloading cosign from ${cosign_download_url}"
+  curl -sSL# "$cosign_download_url" -o "${install_path}/cosign"
+  curl -sSL# "${cosign_download_url}.sig" -o "${install_path}/cosign.sig"
+
+  echo "Downloading sget from ${sget_download_url}"
+  curl -sSL# "$sget_download_url" -o "${install_path}/sget"
+  curl -sSL# "${sget_download_url}.sig" -o "${install_path}/sget.sig"
+
+  echo "Installing to ${install_path}"
+  mv "${install_path}/cosign*" "${bin_install_path}/"
+  chmod +x "${bin_install_path}/cosign"
+  mv "${install_path}/sget*" "${bin_install_path}/"
+  chmod +x "${bin_install_path}/sget"
 }
 
 get_arch() {
@@ -44,11 +50,18 @@ get_platform() {
   echo "${plat}"
 }
 
-get_download_url() {
+cosign_download_url() {
   local version="$1"
   local arch; arch="$(get_arch)"
   local platform; platform="$(get_platform)"
   echo "https://github.com/sigstore/cosign/releases/download/v${version}/cosign-${platform}-${arch}"
+}
+
+sget_download_url() {
+  local version="$1"
+  local arch; arch="$(get_arch)"
+  local platform; platform="$(get_platform)"
+  echo "https://github.com/sigstore/cosign/releases/download/v${version}/sget-${platform}-${arch}"
 }
 
 install_cosign "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
