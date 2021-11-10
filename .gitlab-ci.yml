@@ -27,9 +27,9 @@ asdf-plugin-test:
     - . asdf/asdf.sh
 
   script:
-    - asdf plugin-add dyff $CI_REPOSITORY_URL
+    - asdf plugin-add $PLUGIN_NAME $CI_REPOSITORY_URL
     - asdf list-all $PLUGIN_NAME
-    - asdf plugin test dyff $CI_REPOSITORY_URL --asdf-plugin-gitref $CI_COMMIT_REF_NAME "$PLUGIN_EXEC version" || exit 1
+    - asdf plugin test $PLUGIN_NAME $CI_REPOSITORY_URL --asdf-plugin-gitref $CI_COMMIT_REF_NAME "$PLUGIN_EXEC version" || exit 1
 
 .pushover_call:
   image: curlimages/curl:latest
