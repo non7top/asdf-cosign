@@ -17,9 +17,9 @@ install_cosign() {
   mkdir -p "${bin_install_path}"
 
   for prog in cosign sget; do
-    echo "Downloading ${prog} from $(get_download_url $version cosign)"
-    curl -sSL "$(get_download_url $version cosign)" -o "${bin_install_path}/${prog}"
-    curl -sSL "$(get_download_url $version cosign).sig" -o "${bin_install_path}/${prog}.sig"
+    echo "Downloading ${prog} from $(get_download_url $version $prog)"
+    curl -sSL "$(get_download_url $version $prog)" -o "${bin_install_path}/${prog}"
+    curl -sSL "$(get_download_url $version $prog).sig" -o "${bin_install_path}/${prog}.sig"
 
     chmod +x "${bin_install_path}/${prog}"
   done
