@@ -26,12 +26,11 @@ install_cosign() {
     echo "Downloading signature and verifying"
     curl -sSL "$(get_download_url "$version" "$prog").sig" -o "${bin_install_path}/${prog}.sig"
 
-    "${bin_install_path}/cosign" verify-blob --key "${install_path}/release-cosign.pub" \
-        --signature "${bin_install_path}/${prog}.sig" "${bin_install_path}/${prog}"
-
-    if [ $? -ne 0 ]; then
+    # verify the signature and remove the binary if it fails
+    if ! "${bin_install_path}/cosign" verify-blob --key "${install_path}/release-cosign.pub" \
+        --signature "${bin_install_path}/${prog}.sig" "${bin_install_path}/${prog}"; then
       echo "*WARNING* verification of ${prog} failed - removing binary"
-      rm ${bin_install_path}/${prog}
+      rm "${bin_install_path}/${prog}"
     fi
   done
 }
