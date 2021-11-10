@@ -16,8 +16,7 @@ install_cosign() {
 
   mkdir -p "${bin_install_path}"
 
-  curl -sSL "$(get_download_url $version release-cosign.pub)" -o "${install_path}/release-cosign.pub"
-  cat ${install_path}/release-cosign.pub
+  curl -sSL "https://github.com/sigstore/cosign/releases/download/v${version}/release-cosign.pub" -o "${install_path}/release-cosign.pub"
 
   for prog in cosign sget; do
     echo "Downloading ${prog} from $(get_download_url "$version" "$prog")"
