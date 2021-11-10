@@ -1,6 +1,6 @@
 # cosign asdf Plugin
 
-![Build Status](https://gitlab.com/wt0f/asdf-cosign/badges/master/pipeline.svg)
+![Build Status](https://gitlab.com/wt0f/asdf-cosign/badges/main/pipeline.svg)
 
 This is the plugin repo for [asdf-vm/asdf](https://github.com/asdf-vm/asdf.git)
 to manage [sigstore/cosign](https://github.com/sigstore/cosign).
