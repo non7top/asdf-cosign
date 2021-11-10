@@ -19,12 +19,14 @@ install_cosign() {
   mkdir -p "${bin_install_path}" "${install_path}"
 
   echo "Downloading cosign from ${cosign_download_url}"
-  curl -SL# "$cosign_download_url" -o "${install_path}/cosign"
-  curl -SL# "${cosign_download_url}.sig" -o "${install_path}/cosign.sig"
+  curl -sSL "$cosign_download_url" -o "${install_path}/cosign"
+  curl -sSL "${cosign_download_url}.sig" -o "${install_path}/cosign.sig"
 
   echo "Downloading sget from ${sget_download_url}"
   curl -sSL# "$sget_download_url" -o "${install_path}/sget"
   curl -sSL# "${sget_download_url}.sig" -o "${install_path}/sget.sig"
+
+  ls -l $install_path
 
   echo "Installing to ${install_path}"
   mv "${install_path}/cosign*" "${bin_install_path}/"
