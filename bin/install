@@ -16,7 +16,7 @@ install_cosign() {
   local cosign_download_url; cosign_download_url="$(cosign_download_url "$version")"
   local sget_download_url; sget_download_url="$(sget_download_url "$version")"
 
-  mkdir -p "${bin_install_path}"
+  mkdir -p "${bin_install_path}" "${install_path}"
 
   echo "Downloading cosign from ${cosign_download_url}"
   curl -sSL# "$cosign_download_url" -o "${install_path}/cosign"
