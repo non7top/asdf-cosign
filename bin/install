@@ -16,12 +16,21 @@ install_cosign() {
 
   mkdir -p "${bin_install_path}"
 
+  curl -sSL "$(get_download_url $version release-cosign.pub)" -o "${install_path}/release-cosign.pub"
+
   for prog in cosign sget; do
     echo "Downloading ${prog} from $(get_download_url $version $prog)"
     curl -sSL "$(get_download_url $version $prog)" -o "${bin_install_path}/${prog}"
+    chmod +x "${bin_install_path}/${prog}"
+
+    echo "Downloading signature and verifying"
     curl -sSL "$(get_download_url $version $prog).sig" -o "${bin_install_path}/${prog}.sig"
 
-    chmod +x "${bin_install_path}/${prog}"
+    ${bin_install_path}/cosign verify-blob --key ${install_path}/release-cosign.pub --signature ${bin_install_path}/${prog}.sig ${bin_install_path}/${prog}
+    if [ $? -ne 0 ]; then
+      echo "*WARNING* verification of ${prog} failed - removing binary"
+      rm ${bin_install_path}/${prog}
+    fi
   done
 }
 
