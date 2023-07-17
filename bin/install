@@ -39,7 +39,7 @@ install_cosign() {
 
   # cosign project dropped the sget binary after 2.0.1 release
   progs="cosign"
-  if [ $(semver_compare "${version}" "2.0.2") -eq -1 ]; then
+  if [ "$(semver_compare "${version}" "2.0.2")" -eq -1 ]; then
     progs="${progs} sget"
   fi
 
