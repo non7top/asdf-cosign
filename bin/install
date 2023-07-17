@@ -8,6 +8,25 @@ TMPDIR=${TMPDIR:-/tmp}
 [ -n "$ASDF_INSTALL_VERSION" ] || (>&2 echo 'Missing ASDF_INSTALL_VERSION' && exit 1)
 [ -n "$ASDF_INSTALL_PATH" ] || (>&2 echo 'Missing ASDF_INSTALL_PATH' && exit 1)
 
+# Function to compare versions in a semver compatible way
+# given args A and B, return 0 if A=B, -1 if A<B and 1 if A>B
+semver_compare() {
+  if [ "$1" = "$2" ]; then
+    # A = B
+    echo 0
+  else
+    ordered=$(printf '%s\n' "$@" | sort -V | head -n 1)
+
+    if [ "$ordered" = "$1" ]; then
+      # A < B
+      echo -1
+    else
+      # A > B
+      echo 1
+    fi
+  fi
+}
+
 install_cosign() {
   # local install_type=$1       # not currently used
   local version=$2
@@ -18,7 +37,13 @@ install_cosign() {
 
   curl -sSL "https://github.com/sigstore/cosign/releases/download/v${version}/release-cosign.pub" -o "${install_path}/release-cosign.pub"
 
-  for prog in cosign sget; do
+  # cosign project dropped the sget binary after 2.0.1 release
+  progs="cosign"
+  if [ $(semver_compare "${version}" "2.0.2") -eq -1 ]; then
+    progs="${progs} sget"
+  fi
+
+  for prog in ${progs}; do
     echo "Downloading ${prog} from $(get_download_url "$version" "$prog")"
     curl -sSL "$(get_download_url "$version" "$prog")" -o "${bin_install_path}/${prog}"
     chmod +x "${bin_install_path}/${prog}"
