@@ -63,11 +63,23 @@ install_cosign() {
       verify_args=(--key "${install_path}/release-cosign.pub" --signature "${bin_install_path}/${prog}.sig")
     fi
 
-    # Require a system cosign for verification to avoid verifying a binary with itself.
-    cosign_bin=$(command -v cosign 2>/dev/null) || {
-      echo "ERROR: cosign not found in PATH; cannot verify ${prog}" >&2
-      exit 1
-    }
+    # Prefer a system cosign so we don't verify a binary with itself.
+    # Fall back to the downloaded binary when cosign is not yet installed.
+    if cosign_bin=$(command -v cosign 2>/dev/null); then
+      echo "Using system cosign for verification: ${cosign_bin}"
+    else
+      cosign_bin="${bin_install_path}/cosign"
+      echo "No system cosign found; using downloaded binary for self-verification (less secure)"
+    fi
+    echo "Verifier: $("${cosign_bin}" version 2>&1 | head -1)"
+
+    # print a short audit reference before verifying
+    if [ "$(semver_compare "${version}" "3.0.0")" -ge 0 ]; then
+      log_index=$(grep -o '"logIndex":"[^"]*"' "${bin_install_path}/${prog}.sigstore.json" | head -1 | cut -d'"' -f4)
+      echo "Rekor log index: ${log_index}"
+    else
+      echo "Signature SHA256: $(sha256sum "${bin_install_path}/${prog}.sig" | cut -d' ' -f1)"
+    fi
 
     # verify the signature and fail the install if it does not pass
     if ! "${cosign_bin}" verify-blob \
