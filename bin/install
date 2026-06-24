@@ -76,7 +76,7 @@ install_cosign() {
     # print a short audit reference before verifying
     if [ "$(semver_compare "${version}" "3.0.0")" -ge 0 ]; then
       log_index=$(grep -o '"logIndex":"[^"]*"' "${bin_install_path}/${prog}.sigstore.json" | head -1 | cut -d'"' -f4)
-      echo "Rekor log index: ${log_index}"
+      echo "Rekor entry: https://search.sigstore.dev/?logIndex=${log_index}"
     else
       echo "Signature SHA256: $(sha256sum "${bin_install_path}/${prog}.sig" | cut -d' ' -f1)"
     fi
