@@ -66,11 +66,12 @@ install_cosign() {
     # Prefer a system cosign so we don't verify a binary with itself.
     # Fall back to the downloaded binary when cosign is not yet installed.
     if cosign_bin=$(command -v cosign 2>/dev/null); then
-      echo "Verifier (system): ${cosign_bin} ($("${cosign_bin}" version 2>&1 | head -1))"
+      echo "Verifier (system): ${cosign_bin}"
     else
       cosign_bin="${bin_install_path}/cosign"
-      echo "Verifier (self, less secure): ${cosign_bin} ($("${cosign_bin}" version 2>&1 | head -1))"
+      echo "Verifier (self, less secure): ${cosign_bin}"
     fi
+    "${cosign_bin}" version 2>&1
 
     # print a short audit reference before verifying
     if [ "$(semver_compare "${version}" "3.0.0")" -ge 0 ]; then
