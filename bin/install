@@ -5,8 +5,8 @@ set -o pipefail
 
 ASDF_INSTALL_TYPE=${ASDF_INSTALL_TYPE:-version  }
 TMPDIR=${TMPDIR:-/tmp}
-[ -n "$ASDF_INSTALL_VERSION" ] || (>&2 echo 'Missing ASDF_INSTALL_VERSION' && exit 1)
-[ -n "$ASDF_INSTALL_PATH" ] || (>&2 echo 'Missing ASDF_INSTALL_PATH' && exit 1)
+[ -n "$ASDF_INSTALL_VERSION" ] || (echo >&2 'Missing ASDF_INSTALL_VERSION' && exit 1)
+[ -n "$ASDF_INSTALL_PATH" ] || (echo >&2 'Missing ASDF_INSTALL_PATH' && exit 1)
 
 # Function to compare versions in a semver compatible way
 # given args A and B, return 0 if A=B, -1 if A<B and 1 if A>B
@@ -60,7 +60,7 @@ install_cosign() {
 
     # verify the signature and remove the binary if it fails
     if ! "${bin_install_path}/cosign" verify-blob --key "${install_path}/release-cosign.pub" \
-        "${verify_args[@]}" "${bin_install_path}/${prog}"; then
+      "${verify_args[@]}" "${bin_install_path}/${prog}"; then
       echo "*WARNING* verification of ${prog} failed - removing binary"
       rm "${bin_install_path}/${prog}"
     fi
@@ -68,7 +68,8 @@ install_cosign() {
 }
 
 get_arch() {
-  local arch; arch=$(uname -m | tr '[:upper:]' '[:lower:]')
+  local arch
+  arch=$(uname -m | tr '[:upper:]' '[:lower:]')
   case ${arch} in
   x86_64)
     arch='amd64'
@@ -79,7 +80,8 @@ get_arch() {
 }
 
 get_platform() {
-  local plat; plat=$(uname | tr '[:upper:]' '[:lower:]')
+  local plat
+  plat=$(uname | tr '[:upper:]' '[:lower:]')
 
   echo "${plat}"
 }
@@ -87,8 +89,10 @@ get_platform() {
 get_download_url() {
   local version="$1"
   local prog="$2"
-  local arch; arch="$(get_arch)"
-  local platform; platform="$(get_platform)"
+  local arch
+  arch="$(get_arch)"
+  local platform
+  platform="$(get_platform)"
   echo "https://github.com/sigstore/cosign/releases/download/v${version}/${prog}-${platform}-${arch}"
 }
 
