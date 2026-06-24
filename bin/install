@@ -49,11 +49,18 @@ install_cosign() {
     chmod +x "${bin_install_path}/${prog}"
 
     echo "Downloading signature and verifying"
-    curl -sSL "$(get_download_url "$version" "$prog").sig" -o "${bin_install_path}/${prog}.sig"
+    # cosign v2.0.0+ uses .bundle files and --bundle flag; older releases use .sig / --signature
+    if [ "$(semver_compare "${version}" "2.0.0")" -ge 0 ]; then
+      curl -sSL "$(get_download_url "$version" "$prog").bundle" -o "${bin_install_path}/${prog}.bundle"
+      verify_args=(--bundle "${bin_install_path}/${prog}.bundle")
+    else
+      curl -sSL "$(get_download_url "$version" "$prog").sig" -o "${bin_install_path}/${prog}.sig"
+      verify_args=(--signature "${bin_install_path}/${prog}.sig")
+    fi
 
     # verify the signature and remove the binary if it fails
     if ! "${bin_install_path}/cosign" verify-blob --key "${install_path}/release-cosign.pub" \
-        --signature "${bin_install_path}/${prog}.sig" "${bin_install_path}/${prog}"; then
+        "${verify_args[@]}" "${bin_install_path}/${prog}"; then
       echo "*WARNING* verification of ${prog} failed - removing binary"
       rm "${bin_install_path}/${prog}"
     fi
