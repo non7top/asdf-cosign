@@ -63,8 +63,11 @@ install_cosign() {
       verify_args=(--key "${install_path}/release-cosign.pub" --signature "${bin_install_path}/${prog}.sig")
     fi
 
-    # Prefer a system cosign for verification to avoid verifying a binary with itself.
-    cosign_bin=$(command -v cosign 2>/dev/null || echo "${bin_install_path}/cosign")
+    # Require a system cosign for verification to avoid verifying a binary with itself.
+    cosign_bin=$(command -v cosign 2>/dev/null) || {
+      echo "ERROR: cosign not found in PATH; cannot verify ${prog}" >&2
+      exit 1
+    }
 
     # verify the signature and fail the install if it does not pass
     if ! "${cosign_bin}" verify-blob \
