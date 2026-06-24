@@ -63,11 +63,15 @@ install_cosign() {
       verify_args=(--key "${install_path}/release-cosign.pub" --signature "${bin_install_path}/${prog}.sig")
     fi
 
-    # verify the signature and remove the binary if it fails
-    if ! "${bin_install_path}/cosign" verify-blob \
+    # Prefer a system cosign for verification to avoid verifying a binary with itself.
+    cosign_bin=$(command -v cosign 2>/dev/null || echo "${bin_install_path}/cosign")
+
+    # verify the signature and fail the install if it does not pass
+    if ! "${cosign_bin}" verify-blob \
       "${verify_args[@]}" "${bin_install_path}/${prog}"; then
-      echo "*WARNING* verification of ${prog} failed - removing binary"
       rm "${bin_install_path}/${prog}"
+      echo "ERROR: signature verification of ${prog} failed" >&2
+      exit 1
     fi
   done
 }
